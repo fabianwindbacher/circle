@@ -1,0 +1,13 @@
+# Circle runs on its own. It joins the shared "web" network so the reverse proxy
+# from the other project can reach it as "circle-app"; no ports are published on the host.
+services:
+  circle:
+    build: .
+    restart: unless-stopped
+    networks:
+      web:
+        aliases: [circle-app]
+
+networks:
+  web:
+    external: true

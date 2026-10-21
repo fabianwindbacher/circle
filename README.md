@@ -20,3 +20,47 @@ It's a single static file with no build step and no dependencies apart from Goog
 
 - **Inside claude.ai** (as an Artifact), plans are saved privately to your account and sync across devices.
 - **Anywhere else** (a local file or your own server), plans are saved in the browser's `localStorage`. They stay on that one browser and device. Use *Export backup (.json)* to move them, and *Import* to load them elsewhere.
+
+## Deploying behind an existing Caddy (Docker)
+
+Circle runs as its own Compose project. It is reached through a shared Docker network called `web`, so it publishes no ports and leaves the other project's containers alone.
+
+**One-time setup on the server**
+
+1. Point DNS for the subdomain (for example `circle.example.com`) at the server's IP.
+2. Create the shared network:
+   ```bash
+   docker network create web
+   ```
+3. Start Circle:
+   ```bash
+   git clone <this repo> circle && cd circle
+   docker compose up -d --build
+   ```
+4. In the **other project**, connect its Caddy service to the network. This is the only change there:
+   ```yaml
+   services:
+     caddy:
+       # ...existing config...
+       networks: [default, web]
+
+   networks:
+     web:
+       external: true
+   ```
+   If the Caddy service already lists `networks:`, add `web` to that list, keep the rest, and declare `web` as external as above.
+   Then add a site block to its Caddyfile:
+   ```
+   circle.example.com {
+   	reverse_proxy circle-app:80
+   }
+   ```
+   Apply both with `docker compose up -d caddy` in that project. This recreates only the Caddy container, briefly. Caddy issues the HTTPS certificate on the first request.
+
+**Updating Circle**
+
+```bash
+git pull && docker compose up -d --build
+```
+
+This never touches the other project. If Circle is down, Caddy returns a 502 for the subdomain only.
