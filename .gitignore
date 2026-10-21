@@ -1,0 +1,3 @@
+# Personal plans: keep them out of the repo
+*.drawio
+*.json
