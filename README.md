@@ -14,7 +14,9 @@ A yearly life plan drawn as concentric rings: a purpose in the centre, then valu
 
 ## Running it
 
-It's a single static file with no build step and no dependencies apart from Google Fonts. Open `circle.html` in a browser, or serve it from any static web server.
+It's a single static file (`index.html`) with no build step and no dependencies apart from Google Fonts. Open it in a browser, or serve it from any static web server.
+
+It's hosted on GitHub Pages at https://fabianwindbacher.github.io/circle/. Every push to `main` redeploys it.
 
 ## Where data is stored
 
